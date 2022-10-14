@@ -1,13 +1,7 @@
 import numpy as np
-from objects.obj import Obj
-from constants import STAR_INDICES
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+import trimesh
 
-def find_nearest_integer_smpl(input_avatar: Obj):
-    """ The RTW flow uses smpl with integer params to find the nearest size that should be picked """
-    pass
+from obj import Obj
 
 
 def find_garment_pairs(avatar, garment):
@@ -80,23 +74,67 @@ def grade_garment(input_avatar, target_avatar, input_garment):
     # Flatten bc we need original garment
     flat_garment = graded_garment.flatten(input_garment)
 
-    xs = [x[0] - 400 for x in flat_garment]
-    ys = [x[1] for x in flat_garment]
+    return flat_garment
 
-    ox = [x[0] for x in input_garment.vt]
-    oy = [x[1] for x in input_garment.vt]
+def verts_for_face(index, mesh):
+    """ Given an index of a face, return the vertices of that face """
+    return [mesh.vertices[x] for x in mesh.faces[0]]
 
-    plt.plot(xs, ys, "ro")
-    plt.plot(ox, oy, "bo")
-    plt.axis('equal')
-    plt.show()
-    print("a")
-    graded_garment.to_file("./graded_garment.obj")
 
-    return graded_garment
+def flatten(garment_path):
+    mesh = trimesh.load(file_obj=trimesh.util.wrap_as_stream(open(garment_path, 'r').read()), file_type="obj")
+
+    # Convert the mesh to a graph so we can iterate through edges
+    graph = trimesh.graph.face_adjacency(mesh = mesh)
+
+    # Rotate the mesh so that the first face on the graph is on the xy plane
+    intitial_face_verts = verts_for_face(1, mesh)
+
+    # Transform poi
+    p1 = intitial_face_verts[0]
+    p3 = intitial_face_verts[2]
+
+    # Transform mesh so that v0 is at 0,0,0
+    mesh.apply_translation(-p1)
+
+    # Rotate mesh to lay on xy plane
+    v1 = p3 - p1
+    target = [1, 1, 0]
+
+    rotation = trimesh.geometry.align_vectors(v1, target)
+    mesh.apply_transform(rotation)
+
+    flattened_points = []
+
+    # Put initial face in the plants
+
+    # Mesh should now be on the plane i.e. all z values should be 0 and we start alg
+    for node in graph:
+        face_a = node[0]
+        face_b = node[1]
+
+        # Find Shared Vertices from Faces
+
+        # Find Lone Verts for A and B
+
+        # Get the edgelengths e1, e2 from shared verts to face_b lone vert
+
+        # Draw 2 circles in the plane with radius e1 and e2
+
+        # Find the intersection of the 2 circles furthest from lone vert a
+
+        # This is the new position of the unfolded vertex
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
-    grade_garment("/Users/michaelsachen/Desktop/digicouture/sample_assets/a1.obj",
-                  "/Users/michaelsachen/Desktop/digicouture/sample_assets/a2.obj",
-                  "/Users/michaelsachen/Desktop/digicouture/sample_assets/g1.obj")
+    garment_path = "./sample_assets/Garm_Colorway_1.obj"
+    flatten(garment_path)
+
+
+

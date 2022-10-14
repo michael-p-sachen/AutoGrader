@@ -1,8 +1,5 @@
 import numpy as np
 from scipy.spatial import KDTree
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 
 
 def normalized(point):
@@ -10,7 +7,7 @@ def normalized(point):
 
 
 def magnitude(v1, v2):
-        return np.linalg.norm(v1-v2)
+    return np.linalg.norm(v1-v2)
 
 
 class Obj:
@@ -80,57 +77,15 @@ class Obj:
         with open(path, 'w') as file:
             file.writelines(lines)
 
-    def flatten(self, original):
+    def flatten(self):
+        # Convert our object to trimesh
 
-        flattened_verts = []
-        # This Loop Gives us all 2d points
-        for i, _ in enumerate(original.v):
-            if i > 0:
-                # Original Textures
-                vt_og = np.array(original.vt[i])
-                vt_prior_og = np.array(original.vt[i - 1])
+        # Turn it into a graph
 
-                # Original Vertices
-                v_og = np.array(original.v[i])
-                v_prior_og = np.array(original.v[i-1])
+        # BFS through edges
 
-                # New Verts
-                v_n = np.array(self.v[i])
-                v_prior_n = np.array(self.v[i-1])
+        # Get Edge Lengths
 
-                # Calculate direction vector from vt og i - 1 to i
-                vt_og_direction = normalized(vt_og - vt_prior_og)
+        # Draw Circles in same plane
 
-                # Calculate 2D Magnitude from vt og
-                vt_og_magnitude = magnitude(vt_og, vt_prior_og)
-
-                # Calculate Magnitude from v og i - 1 to i
-                v_og_magnitude = magnitude(v_og, v_prior_og)
-
-                # Calculate ratio of |v| / |vt| for og
-                scaled_magnitude_ratio = vt_og_magnitude / v_og_magnitude
-
-                # Calculate magnitude from vn i-1 to i
-                v_magnitude = magnitude(v_n, v_prior_n)
-
-                # Multiply magnitude by scalar ratio
-                scaled_n_magnitude = v_magnitude * scaled_magnitude_ratio
-
-                # place point at scaled magnitude x direction
-                new_point = (scaled_n_magnitude * vt_og_direction) + flattened_verts[i-1]
-
-            else:
-                new_point = (0, 0)
-
-            flattened_verts.append(new_point)
-
-            if i > 70:
-                xs = [x[0] for x in flattened_verts]
-                ys = [x[1] for x in flattened_verts]
-                plt.plot(xs, ys, "ro")
-                plt.show()
-                plt.axis('equal')
-                print("a")
-
-
-        return flattened_verts
+        ...
