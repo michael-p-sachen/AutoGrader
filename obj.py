@@ -77,15 +77,16 @@ class Obj:
         with open(path, 'w') as file:
             file.writelines(lines)
 
-    def flatten(self):
-        # Convert our object to trimesh
+    def flat(self, flattened_verts):
+        # Take our flattened verts, and create an obj using the faces from the self object
 
-        # Turn it into a graph
+        lines = []
 
-        # BFS through edges
+        for i in range(len(flattened_verts)):
+            a = flattened_verts[i]
+            lines.append(f"v {a[0]} {a[1]} {a[2]}\n")
+        for f in self.f:
+            lines.append(f"f {str(f[0])} {str(f[1])} {str(f[2])}\n")
 
-        # Get Edge Lengths
-
-        # Draw Circles in same plane
-
-        ...
+        with open("./test.obj", 'w') as f:
+            f.writelines(lines)
